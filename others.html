@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Libris Locus Motivus</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="copyright" content="S.Tajima">
+<meta name="description" content="O gauge Locomotive models">
+<meta name="keywords" content="Locomotive, models, modeling, O gauge, scratch build,
+controller, machine tools">
+
+<link rel="stylesheet" href="css_style_2021125.css">
+<script type="text/javascript" src="js/openclose.js"></script>
+<script type="text/javascript" src="js/analytics.js"></script>
+</head>
+
+<body id="top">
+
+<div id="container">
+
+<header>
+<h1>MISCELLANEOUS </h1>
+<h2>Controllers etc.</h2>
+<p id="logo"><a href="index.html">
+<img src="images_top/Web_page_logo2.jpg" width="500" height="100" alt="Libris Veritas"></a></p>
+</header>
+
+
+
+<nav id="menubar">
+<ul>
+<li ><a href="index.html">HOME</a></li>
+<li><a href="steam.html">STEAM LOCOMOTIVES</a></li>
+<li><a href="electric_1.html">ELECTRIC LOCOMOTIVES 1</a></li>
+<li><a href="electric_2.html">ELECTRIC LOCOMOTIVES 2</a></li>
+<li id="current"><a href="others.html">MISCELLANEOUS</a></li>
+
+</ul>
+</nav>
+
+<div id="contents">
+
+<div id="main_misc">
+
+<section>
+<nav id="others.html">
+<h2>Controllers</h2>
+</nav>
+
+     <p>
+	 The first controller was just a bipolar variable voltage DC power supply which supplied
+	 somewhere around -12 to +12 V by a control lever. On the lcomotive side, only a voltage
+	 regulator was installed to suit the ratings of motors equipped. No control for headlights
+     or other features were realized. Since the gauge is 0, it is not very practical to make a layout 
+	 to drive
+	 locomotives with carriages. But this limitation did not mean that the locomotves should be
+     just diplay modells (at least for me).	That was the reason that all the locomotives are
+     equipped with motors and should run with reasonable speed, but not necesarrily haul 
+     heavy loads even for modells like Big Boy.	 
+	 
+	 In around early 90's, I had ana idea to control locomotives by super imposed digital signal to the
+	 power supply. Since the decoder on the locomotive side should be operating all the time,
+	 it is the easiest to supply the rails with constant voltage. And the nominal voltage for easily
+	 available motors are from around 5V to 12 or 15V, I decided to supply 20V to the rails. 
+	 </p>
+	 <p>
+	 By simple experiment, the locmotive worked reasonably well; some mis interpretation happened,
+	 but by sending signal continuously recovers the error almost instantaneously. Also, in later
+	 design, the microprocessor on locomotive side can prohibit some errors, like the change of
+	 direction without passing through speed zero, and the reliability increased.
+	</p>
+	 <p>
+	 If desigend now (2021), much better protocol is easily implimented, with even wireless 
+	 communication scheme. (All the modells are made by brass, there can be a problem where to
+	 install the antenna.) But, well, modification of thirty one locomotives as well as the two controllers
+	 are bit cumbersome task and thus, I leave them as they are.
+	 
+	 
+	 <p/>
+	 
+	 
+	 
+	 </p>
+    <figure><img src="images_controllers/Cont_2.jpg" alt="controller view"></figure>
+    <p>
+	 This is the first generation digital controler. Rough specification of digital controller is as follows.
+	 </p>
+	 <p>
+     *  Address and control are sent to locomotives by amplitude modulation, which is  
+	 superimposed on DC 20V power source.
+    </p>
+	 <p>
+     *  Address is 0 to 64; 64 locomotives may be controlled on a single rail (theoretically).
+    </p>
+	 <p>
+     *  The controller has two channels; thus two locomotives may be controlled imultaneously.
+    </p>
+	<p>
+	 *  Controlled features are speed (eight steps), direction, head light ON/OFF for both endsDigital
+	 and up/down controle of two pantographs. (This makes eight bit in total). 
+     </p>
+     <p>
+	 The first generation was made by CMOS random logic that limited the communication protocol
+	 to minimum complexity. Particularly, the PAM signal should be decoded and motors are driven
+	 at the locomotive side, ICs necessary should be minimal. This controller was replaced by a second
+	 generation controller.
+	 </p>
+
+	
+	
+	
+	<p>
+	 Second generation controller by microprocessor based design. The communication protocol 
+	 is identical to the first generation. Because of the processing capability, detailed features
+	 were improved such as the prohibition of same address for two channels. Also, made much 
+	 more compact compared with the first generation controller.
+
+    </p>
+    
+	
+	
+	<p>
+     Second generation No2. The features are identical with above. The only difference being the
+	 encolsure design and different kind of processor. Slightly smaller DC power output. Even more
+	 compact than the above controller.
+    </p>
+
+<h2>Locomotive Control block diagram/circuit</h2>
+
+	<p>
+     The controllers above are rather old design, and not quite appropriate to discuss how they work.
+	 </p>
+	 <p>
+	 If I were to design a new version, and still adopting PAM control signals superimposed to 
+	 the DC voltage, here is the idea. Please mind that I did't make the following circuit, but just 
+     trying to show how I would do. Also, an oscilloscope will be necessary to debug the hardware 
+	 as well as a microprocessor development kit. 
+    <a href="pdfs/controler_principle.pdf"download="pdfs/controler_principle.pdf">
+    <p>  </p>
+    <span class="mgr-10">Block dia/circuit(52KB)<img src="images_top/PDF_32.png"></span></a>
+	 
+	 <h3>Protocol</h3>
+	 <p>
+	 For the controller side, the signals would be the conventional serial communication 
+	 with a protocol something like this. 8bit data with 1 start bit, and 1 stop bit.
+	 </p>
+	 <p>
+	 HEADER+ADDRESS+DATA+CHECKSUM &nbsp;(10bitsx4=30bits =4.2mSec)
+	 </p>
+	 <p>
+	 Suppose all of them are 1 byte data, HEADER is some character of your choice, ADDRESS is
+	 from 0 to 255, and DATA maybe, 3bits for speed, 1bit for direction and other 4
+	 bits for your choice. Synchronization shall be established by detecting HEADER to 
+	 CHECKSUM as a single packet. Since the contact between rail and wheel is not always good,
+	 CHECKSUM byte shall be necessary. 
+	 The speed of communication would be 9600bps and above 4 bytes are sent continually,
+	 that is, if a single locomotive only is controlled, just repeat the same signal. If more than one
+	 locomotives need to be controlled, then send the signal sequentially. Since it takes 4.2msec 
+	 for a single locomotive, even 50
+	 locomotives would consume around 0.2sec which is sufficient for each locomotives to change 
+	 status.
+	 </p>
+	 <h3>Cotroller</h3>
+	 <p>
+	 Carrier frequency may be around 4MHz (there is no definitive reason) and the circuit shown 
+	 should work. The magnitude of the superimposed carrier would be 0.7Vpp or about.
+	 Important point is that the carrier output should not be absorbed by the output capacitance
+	 of DC power supply for driver. This is the reason that the Line Filter is inserted. (Value may be
+	 around 1mH; it should be enough impedance for the carrier frequency. )
+	 
+	 </p>
+   <h3>Locomotive</h3>
+	<p>
+	For the locomotive side, there may be two different power voltage necessary; one for controller
+	and the other for motor. Important points for the locomotive side are the inductance L and 
+	diode D. Inductance L is to make the locomotive with reasonablly high impedance for the carrier
+    frequency. Diode D is to prevent the locomotive side electronics destroyed when +/- is 
+	mistaken which generally happens. The demodulator is tuned to the carrier frequnecy by
+    variable capacitor (in practice, this is not very critical). And decoded signal is fed to the
+    microprocessor. The protocol decoding is performed by the processor and it depends 
+    on the protocol design. The output for this example is speed 3bits and direction 1
+	bit. For the speed output, HHH is the lowest speed for this circuit diagram.
+	The D/A conversion and DC voltage conversion in this circuit is NOT well designed. Bias for
+	both OP amp is messed up to the final output voltage. The outputo voltage for the motor
+	is regulated by a SERIES regulator for simplicity's sake. Line filter and capacitors 
+	(0.1 microfarad, ceramic) are necessary to prevent noise caused by the driver motor.
+	
+	</p>
+	
+	
+</section>
+
+<p>
+
+<h2>Nickel plating of Brass</h2>
+     <p>
+      There are several solutions used for nickel plating, but "Citric acid bath" works all right.
+	  The chemicals listed below should be dissolved by 1 litre pure water. Of cource, if you need
+	  less solution, you just reduce the amount of chemicals keeping the proportion. 
+     </p>
+     <p>
+     Citric acid bath
+     <ul>
+     <li><span class="mgl-60">Citric acid </span><span class="mgl-60"> <span class="mgl-60">
+      &nbsp;&nbsp; &nbsp; 21g/l</span> </li>
+     <li><span class="mgl-60">Nickel sulfate (NiSO4 )</span><span class="mgl-60">280g/l</li>
+     <li><span class="mgl-60">Nickel chloride (Nicl2 )</span><span class="mgl-60">45g/l</li>
+     </ul>
+     </p>
+     <p>
+      In actual plating, around 2V DC power source is required. Connect plus to nickel, and minus to
+      the components to be plated. Warm the solution at around 30 degree Celsius. The temperature
+	  may be roughly kept on desktop plating. But be sure that the target brass is well polished and
+	  no grease/oill remains before nickel plating. This plain method is not for manufacturing, but 
+	  it will work for hobbyists.	  
+     </p>
+     <figure><img src="images_top/DSC00131.jpg" alt="Nickel plating"></figure>
+     <p> &nbsp  </p>
+<h2>Insulating materials</h2>
+    <p>
+	 Center of wheels requires insulation when power is supplied via two rails. The best material I 
+	 used so far is PEEK(polyetheretherketone), and these are sold by circular rods.
+	 An alternative may be POM(polyacetal) which are more widely known by Duracon or Derlin.
+	 These materials are fitted by acrylic instant adhesives. Then, tapping of M4 is made without 
+	 much difficulties. It is also durable, and after thirty years, it seems all right. 
+	</p>
+	<figure><img src="images_controllers/BLS_wheel.jpg" alt="Wheel insulation"></figure>
+	<p>
+	 In the above picture, the whitish ring surrounding the axle on the upper wheel is the insulator.
+	 The picture shows a driving wheel of BLS Be-5/7, and the upper wheel is permanently screwed
+	 to the axle by M4. The lower side wheel is fixed to the axle by an M3 countersunk screw so that
+     the phase of two wheels can be adjusted.	 
+	</p>
+	 <p> &nbsp  </p>
+<h2>Oil</h2>	 
+    <p>
+	 One of the disastrous mistakes is the choice of luburication oils. Plastic gears are generally
+	 made by POM and using certain type of oil ( I have no clear definition which is bad) produces
+	 cracks to these components after, say, five years or so.
+	 Use silicone oil that is proved to be usable to plastic materials.  Also, rubber belts will be 
+	 deteriorated by oil. Need to be very careful. 
+	</p>
+    <p> &nbsp  </p>
+<h2>Urethane belt</h2>	 
+    <p>
+	 Urethane (the orange colored belt) is very useful to make cutom length belts. Since pullys are 
+	 easy to make by a lathe,
+     one may tempted to make them by brass. But urethane is corroded by brass after five years or so.
+     Aluminium should be used to pullies driven by urethane belts. 
+	 </p>
+     <figure><img src="images_controllers/urethane_belt.jpg" alt="degraded urethane belt"></figure>
+     <p>
+	 The above picture shows the degraded urethane belt by continuous contact with a brass pully.
+	 On the left hand side, the color has changed, and deformed permanently. 
+	 </p>
+	 <p>
+	 Connection of the urethane belt
+	 seems to be best done by usig the tip of soldering iron.
+	 </p>
+	 <p> &nbsp  </p> 
+	 
+<h2>DC motor noise</h2>	 
+    <p>
+	 One of the small difficulties of commutator DC motor is the noise produced by the motor
+	 in operation. Without counter measure, the noise may well cause microprocessor
+	 malfunction.  
+	 In order to cope with this noize, ceramic capacitor (around 0.1uF) must be solderd to 
+	 the nearest point of the motor power terminal as shown in the picture. Also, use line 
+	 filter between the driver output and the motor.
+	 </p>
+     <figure><img src="images_controllers/DC_motor.jpg" alt="DC motor noise"></figure>
+     <p>
+	 The above picture is an example used for GG1, and two motors are connected in series.
+	 This series connection is only feasible when two motors are mechanically connected by 
+	 gears (driving a single axle). 
+	 </p>
+	 
+	 </p>
+	 <p> &nbsp  </p> 	 
+	 
+<p id="pagetop"><a href="#">↑ PAGE TOP</a></p>
+</div>
+<!--/main-->
+
+<div id="sub">
+
+
+<nav>
+<h2>
+<p>    Steam Locomotives</p>
+<p>　　QUICK JUMP </p>
+ 
+</h2>
+
+<ul class="submenu mb10">
+<li><a href="steam.html#UP4000">Big Boy UP4000</a></li>
+<li><a href="steam.html#southern_21C">Southern 21C17</a></li>
+<li><a href="steam.html#db_01">DB 01 220</a></li>
+<li><a href="steam.html#NSWR_AD60">NSWR AD6039</a></li>
+<li><a href="steam.html#LNER_class_A4">LNER A4 4467</a></li>
+<li><a href="steam.html#du_Bousquet">Du Bousquet 6.024</a></li>
+<li><a href="steam.html#BR_18">BR 18451</a></li>
+<li><a href="steam.html#CFA_BT1">CFA BT1</a></li>
+</ul>
+
+<h2>
+<p>　Electric Locomotives 1</p>
+<p>　　QUICK JUMP </p>
+</h2>
+<ul class="submenu ">
+<li><a href="electric_1.html#crocodile">Crocodile Ce 6/8 14253</a></li>
+<li><a href="electric_1.html#JNR_EF64">JNR EF64 1001</a></li>
+<li><a href="electric_1.html#SNCB_27">SNCB 2730</a></li>
+<li><a href="electric_1.html#NS_1200">NS 1211</a></li>
+<li><a href="electric_1.html#FS_E645">FS E645 005</a></li>
+<li><a href="electric_1.html#PRR_class_L5">PRR L5 3930</a></li>
+<li><a href="electric_1.html#SNCF_CC14000">SNCF　CC14001</a></li>
+<li><a href="electric_1.html#OBB_class_1044">OBB 1044.14</a></li>
+<li><a href="electric_1.html#OBB_class_1082">OBB 1082.1</a></li>
+<li><a href="electric_1.html#PRR_GG1">PRR GG1 4935</a></li>
+<li><a href="electric_1.html#SJ_class_Ra">SJ Ra 846</a></li>
+<li><a href="electric_1.html#NSB_class_El16">NSB El16 2210</a></li>
+</ul>
+
+<h2>
+<p>　Electric Locomotives 2</p>
+<p>　　QUICK JUMP </p>
+</h2>
+<ul class="submenu ">
+<li><a href="electric_2.html#SNCF_class_CC40110">SNCF CC40110</a></li>
+<li><a href="electric_2.html#CD_S699">CD S699</a></li>
+<li><a href="electric_2.html#CD_class_350">CD class 350</a></li>
+<li><a href="electric_2.html#SBB_Ae_3_6">SBB Ae 3/6 10711</a></li>
+<li><a href="electric_2.html#SNCB_class_20">SNCB 2019</a></li>
+<li><a href="electric_2.html#FS_class_E412">FS class E.412</a></li>
+<li><a href="electric_2.html#Class_EP2">Bipolar class EP2 E3</a></li>
+<li><a href="electric_2.html#DB_E70">DB E7021</a></li>
+<li><a href="electric_2.html#DB_class111">DB class 111</a></li>
+<li><a href="electric_2.html#BLS_Be_5_7">BLS Be-5/7 151</a></li>
+<li><a href="electric_2.html#Alioth_2BB2">Alioth 2BB2</a></li>
+</ul>
+
+
+
+</div>
+<!--/sub-->
+
+
+
+</div>
+<!--/contents-->
+
+<footer>
+<small>Copyright&copy; 2021 <a href="index.html">S.Tajima</a>　All Rights Reserved.</small>
+
+</footer>
+
+</div>
+<!--/container-->
+
+
+
+
+</body>
+</html>
